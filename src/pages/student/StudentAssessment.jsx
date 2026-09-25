@@ -7,6 +7,7 @@ import {
   PlayCircle, ChevronDown, MapPin, Building2, X, Award, FileText, Download, 
   RotateCcw, ExternalLink, HelpCircle, CheckCheck
 } from 'lucide-react';
+import { getCurrentUser } from '../../utils/authStorage';
 import './StudentAssessment.css';
 
 // Database of Skills & Real Technical Assessment Questions
@@ -325,6 +326,7 @@ const TEST_DETAILS_DATA = {
 
 const StudentAssessment = () => {
   const navigate = useNavigate();
+  const [currentUser] = useState(() => getCurrentUser('student'));
   const [activeTab, setActiveTab] = useState('assessment');
   const [activeCategory, setActiveCategory] = useState('Technical Skills');
   const [currentSkillKey, setCurrentSkillKey] = useState('plc');
@@ -1380,7 +1382,7 @@ const StudentAssessment = () => {
                 </span>
                 <h2>{viewDetailsModalSkill.testTitle}</h2>
                 <span style={{ fontSize: '12px', color: '#64748b' }}>
-                  Category: {viewDetailsModalSkill.category} • Student: Priya Sharma (ITI Trainee)
+                  Category: {viewDetailsModalSkill.category} • Student: {currentUser?.fullName || 'Student Trainee'} ({currentUser?.educationLevel || 'ITI'} Trainee)
                 </span>
               </div>
               <button 

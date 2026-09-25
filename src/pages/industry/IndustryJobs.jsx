@@ -4,6 +4,7 @@ import {
   Filter, MoreHorizontal, X, ArrowUp, CheckCircle, AlertCircle, Building2, MapPin
 } from 'lucide-react';
 import { getPublishedJobs, addPublishedJob } from '../../utils/jobStorage';
+import { getCurrentUser } from '../../utils/authStorage';
 import './IndustryJobs.css';
 
 const JobKpiCard = ({ title, value, change, icon: Icon, colorClass }) => (
@@ -44,6 +45,7 @@ const initialFormState = {
 };
 
 const IndustryJobs = () => {
+  const [currentUser] = useState(() => getCurrentUser('employer'));
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [jobsData, setJobsData] = useState(() => getPublishedJobs());
   const [searchQuery, setSearchQuery] = useState('');
@@ -144,7 +146,7 @@ const IndustryJobs = () => {
     const newJob = {
       id: `job-${Date.now()}`,
       role: form.role.trim(),
-      company: 'ABC Industries Pvt. Ltd.',
+      company: currentUser?.companyName || 'Registered Employer',
       department: form.department,
       vacancies: Number(form.vacancies),
       loc: form.loc,

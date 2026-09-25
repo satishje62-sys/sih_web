@@ -145,21 +145,29 @@ export const registerInstitute = (instituteData) => {
 export const loginInstitute = (identifier, password) => {
   const institutes = getRegisteredInstitutes();
   const cleanId = (identifier || '').trim().toLowerCase();
+  const cleanPhoneDigits = (identifier || '').replace(/\D/g, '');
   const cleanPass = (password || '').trim();
 
   if (!cleanId || !cleanPass) {
-    return { success: false, message: 'Please provide both Institute ID/Email and Password.' };
+    return { success: false, message: 'Please provide both Institute ID/Email/Phone and Password.' };
   }
 
-  const user = institutes.find(inst => 
-    ((inst.email && inst.email.trim().toLowerCase() === cleanId) ||
-     (inst.regNumber && inst.regNumber.trim().toLowerCase() === cleanId))
-  );
+  const user = institutes.find(inst => {
+    const emailMatch = inst.email && inst.email.trim().toLowerCase() === cleanId;
+    const regMatch = inst.regNumber && inst.regNumber.trim().toLowerCase() === cleanId;
+    const instPhoneDigits = (inst.contactNumber || '').replace(/\D/g, '');
+    const phoneMatch = cleanPhoneDigits.length >= 7 && instPhoneDigits && (
+      instPhoneDigits === cleanPhoneDigits ||
+      instPhoneDigits.endsWith(cleanPhoneDigits) ||
+      cleanPhoneDigits.endsWith(instPhoneDigits)
+    );
+    return emailMatch || regMatch || phoneMatch;
+  });
 
   if (!user) {
     return {
       success: false,
-      message: 'No registered institute found matching this Registration Number or Email. Please register first.'
+      message: 'No registered institute found matching this Registration Number, Email or Phone. Please register first.'
     };
   }
 
@@ -192,12 +200,12 @@ export const getRegisteredEmployers = () => {
 export const registerEmployer = (employerData) => {
   const employers = getRegisteredEmployers();
   
-  const cleanEmail = (employerData.officialEmail || '').trim().toLowerCase();
+  const cleanEmail = (employerData.officialEmail || employerData.email || '').trim().toLowerCase();
   const cleanReg = (employerData.regNumber || '').trim().toLowerCase();
 
   const existing = employers.find(emp => 
-    (emp.officialEmail && emp.officialEmail.trim().toLowerCase() === cleanEmail) ||
-    (emp.regNumber && emp.regNumber.trim().toLowerCase() === cleanReg)
+    (cleanEmail && emp.officialEmail && emp.officialEmail.trim().toLowerCase() === cleanEmail) ||
+    (cleanReg && emp.regNumber && emp.regNumber.trim().toLowerCase() === cleanReg)
   );
 
   if (existing) {
@@ -212,6 +220,7 @@ export const registerEmployer = (employerData) => {
     ...employerData,
     officialEmail: cleanEmail,
     regNumber: (employerData.regNumber || '').trim(),
+    contactNumber: (employerData.contactNumber || '').trim(),
     registeredAt: new Date().toLocaleDateString('en-IN'),
   };
 
@@ -224,16 +233,25 @@ export const registerEmployer = (employerData) => {
 export const loginEmployer = (identifier, password) => {
   const employers = getRegisteredEmployers();
   const cleanId = (identifier || '').trim().toLowerCase();
+  const cleanPhoneDigits = (identifier || '').replace(/\D/g, '');
   const cleanPass = (password || '').trim();
 
   if (!cleanId || !cleanPass) {
-    return { success: false, message: 'Please provide both Company ID/Email and Password.' };
+    return { success: false, message: 'Please provide both Company ID/Email/Phone and Password.' };
   }
 
-  const user = employers.find(emp => 
-    ((emp.officialEmail && emp.officialEmail.trim().toLowerCase() === cleanId) ||
-     (emp.regNumber && emp.regNumber.trim().toLowerCase() === cleanId))
-  );
+  const user = employers.find(emp => {
+    const emailMatch = (emp.officialEmail && emp.officialEmail.trim().toLowerCase() === cleanId) ||
+                       (emp.email && emp.email.trim().toLowerCase() === cleanId);
+    const regMatch = emp.regNumber && emp.regNumber.trim().toLowerCase() === cleanId;
+    const empPhoneDigits = (emp.contactNumber || '').replace(/\D/g, '');
+    const phoneMatch = cleanPhoneDigits.length >= 7 && empPhoneDigits && (
+      empPhoneDigits === cleanPhoneDigits ||
+      empPhoneDigits.endsWith(cleanPhoneDigits) ||
+      cleanPhoneDigits.endsWith(empPhoneDigits)
+    );
+    return emailMatch || regMatch || phoneMatch;
+  });
 
   if (!user) {
     return {
@@ -272,7 +290,7 @@ export const registerStudent = (studentData) => {
   const students = getRegisteredStudents();
   
   const cleanEmail = (studentData.email || '').trim().toLowerCase();
-  const cleanMobile = (studentData.mobile || '').trim();
+  const cleanMobile = (studentData.mobile || studentData.phone || '').trim();
 
   const existing = students.find(s => 
     (cleanEmail && s.email && s.email.trim().toLowerCase() === cleanEmail) ||
@@ -303,16 +321,23 @@ export const registerStudent = (studentData) => {
 export const loginStudent = (identifier, password) => {
   const students = getRegisteredStudents();
   const cleanId = (identifier || '').trim().toLowerCase();
+  const cleanPhoneDigits = (identifier || '').replace(/\D/g, '');
   const cleanPass = (password || '').trim();
 
   if (!cleanId || !cleanPass) {
     return { success: false, message: 'Please enter your Email/Mobile and Password.' };
   }
 
-  const user = students.find(s => 
-    ((s.email && s.email.trim().toLowerCase() === cleanId) ||
-     (s.mobile && s.mobile.trim() === cleanId))
-  );
+  const user = students.find(s => {
+    const emailMatch = s.email && s.email.trim().toLowerCase() === cleanId;
+    const sPhoneDigits = (s.mobile || s.phone || '').replace(/\D/g, '');
+    const phoneMatch = cleanPhoneDigits.length >= 7 && sPhoneDigits && (
+      sPhoneDigits === cleanPhoneDigits ||
+      sPhoneDigits.endsWith(cleanPhoneDigits) ||
+      cleanPhoneDigits.endsWith(sPhoneDigits)
+    );
+    return emailMatch || phoneMatch;
+  });
 
   if (!user) {
     return {
@@ -366,3 +391,26 @@ export const isAuthenticated = (role) => {
 export const logoutUser = (role) => {
   setCurrentUser(role, null);
 };
+
+export const updateUserProfile = (role, updatedData) => {
+  const current = getCurrentUser(role);
+  if (!current) return { success: false, message: 'No active user session' };
+
+  const merged = { ...current, ...updatedData };
+  setCurrentUser(role, merged);
+
+  // Update in registered accounts list
+  if (role === 'institute') {
+    const list = getRegisteredInstitutes().map(inst => inst.id === merged.id ? merged : inst);
+    localStorage.setItem(STORAGE_KEYS.INSTITUTES, JSON.stringify(list));
+  } else if (role === 'employer' || role === 'industry') {
+    const list = getRegisteredEmployers().map(emp => emp.id === merged.id ? merged : emp);
+    localStorage.setItem(STORAGE_KEYS.EMPLOYERS, JSON.stringify(list));
+  } else {
+    const list = getRegisteredStudents().map(stud => stud.id === merged.id ? merged : stud);
+    localStorage.setItem(STORAGE_KEYS.STUDENTS, JSON.stringify(list));
+  }
+
+  return { success: true, user: merged };
+};
+

@@ -26,8 +26,9 @@ const StudentLayout = () => {
     navigate('/student/login');
   };
 
-  const studentName = currentUser?.fullName || 'Priya Sharma';
-  const subtitle = `${currentUser?.tradeBranch || 'Trainee'} • ${currentUser?.instituteName || 'Maharashtra ITI'}`;
+  const studentName = currentUser?.fullName || 'Registered Student';
+  const initials = studentName.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'ST';
+  const subtitle = `${currentUser?.tradeBranch || 'Trainee'} • ${currentUser?.instituteName || 'Maharashtra Institute'}`;
 
   return (
     <div className="dashboard-layout">
@@ -170,7 +171,9 @@ const StudentLayout = () => {
               style={{ cursor: 'pointer', position: 'relative' }}
               onClick={() => { setProfileMenuOpen(!profileMenuOpen); setNotificationsOpen(false); setHelpOpen(false); }}
             >
-              <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100&h=100" alt="Student" className="avatar-img" />
+              <div className="avatar" style={{ backgroundColor: '#2563eb', color: 'white', fontWeight: '700', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '13px' }}>
+                {initials}
+              </div>
               <div className="user-info">
                 <span className="user-name" style={{ maxWidth: '140px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   {studentName}

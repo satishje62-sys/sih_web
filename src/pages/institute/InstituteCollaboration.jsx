@@ -5,9 +5,11 @@ import {
   Clock, Sparkles, Building, Check, Award
 } from 'lucide-react';
 import { getCollaborations, addCollaboration } from '../../utils/collaborationStorage';
+import { getCurrentUser } from '../../utils/authStorage';
 import './InstituteCollaboration.css';
 
 const InstituteCollaboration = () => {
+  const [currentUser] = useState(() => getCurrentUser('institute'));
   const [collaborations, setCollaborations] = useState(() => getCollaborations());
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState('All');
@@ -65,7 +67,7 @@ const InstituteCollaboration = () => {
 
     const newRequest = {
       id: `collab-${Date.now()}`,
-      instituteName: 'Shree Ganesh ITI Pune',
+      instituteName: currentUser?.name || 'Registered Institute',
       industryName: form.industryName.trim(),
       sector: form.sector,
       trade: form.trade,

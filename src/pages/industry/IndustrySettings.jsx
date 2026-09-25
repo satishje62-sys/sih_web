@@ -4,6 +4,7 @@ import {
   Upload, Key, MoreHorizontal, Clock, Building2, Briefcase, GraduationCap, 
   AlertTriangle, Info, Plus, Trash2, X, Shield, Smartphone, Eye, EyeOff
 } from 'lucide-react';
+import { getCurrentUser } from '../../utils/authStorage';
 import './IndustrySettings.css';
 
 const DEFAULT_PROFILE = {
@@ -33,17 +34,39 @@ const DEFAULT_USERS = [
 const IndustrySettings = () => {
   const [activeTab, setActiveTab] = useState('profile'); // 'profile', 'company', 'users', 'security', 'notifications'
   const [toastMessage, setToastMessage] = useState(null);
+  const currentUser = getCurrentUser('employer');
 
   // Profile Form State
   const [profile, setProfile] = useState(() => {
     const saved = localStorage.getItem('skillbridge_employer_profile');
-    return saved ? JSON.parse(saved) : DEFAULT_PROFILE;
+    if (saved) return JSON.parse(saved);
+    if (currentUser) {
+      return {
+        fullName: currentUser.contactPerson || currentUser.companyName || DEFAULT_PROFILE.fullName,
+        email: currentUser.officialEmail || currentUser.email || DEFAULT_PROFILE.email,
+        phone: currentUser.contactNumber || DEFAULT_PROFILE.phone,
+        designation: currentUser.designation || DEFAULT_PROFILE.designation,
+        avatarInitials: (currentUser.contactPerson || currentUser.companyName || 'IU').split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase()
+      };
+    }
+    return DEFAULT_PROFILE;
   });
 
   // Company Form State
   const [company, setCompany] = useState(() => {
     const saved = localStorage.getItem('skillbridge_employer_company');
-    return saved ? JSON.parse(saved) : DEFAULT_COMPANY;
+    if (saved) return JSON.parse(saved);
+    if (currentUser) {
+      return {
+        companyName: currentUser.companyName || DEFAULT_COMPANY.companyName,
+        industrySector: currentUser.sector || DEFAULT_COMPANY.industrySector,
+        registeredAddress: currentUser.address || DEFAULT_COMPANY.registeredAddress,
+        website: currentUser.website || DEFAULT_COMPANY.website,
+        companyCin: currentUser.regNumber || DEFAULT_COMPANY.companyCin,
+        description: `We are a registered industry partner in Maharashtra focused on ${currentUser.sector || 'manufacturing'} and recruitment of skilled ITI & Polytechnic trainees.`
+      };
+    }
+    return DEFAULT_COMPANY;
   });
 
   // Users State

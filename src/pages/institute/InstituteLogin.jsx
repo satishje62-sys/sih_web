@@ -36,7 +36,7 @@ const InstituteLogin = () => {
     setErrorMessage('');
 
     if (!identifier.trim()) {
-      setErrorMessage('Please enter your Institute ID, Code, or Email.');
+      setErrorMessage('Please enter your Institute ID, Code, Email, or Phone Number.');
       return;
     }
     if (!password.trim()) {
@@ -174,7 +174,7 @@ const InstituteLogin = () => {
               </span>
               <input 
                 type="text" 
-                placeholder="Institute ID / DGT Code / Official Email" 
+                placeholder="Institute ID / DGT Code / Official Email / Phone" 
                 value={identifier}
                 onChange={(e) => { setIdentifier(e.target.value); setErrorMessage(''); }}
                 required 

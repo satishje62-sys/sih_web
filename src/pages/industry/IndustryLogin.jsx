@@ -50,7 +50,7 @@ const IndustryLogin = () => {
     setErrorMessage('');
 
     if (!identifier.trim()) {
-      setErrorMessage('Please enter your Company CIN/Registration Number or Official Email.');
+      setErrorMessage('Please enter your Company CIN, Official Email, or Registered Phone Number.');
       return;
     }
     if (!password.trim()) {
@@ -188,7 +188,7 @@ const IndustryLogin = () => {
               </span>
               <input 
                 type="text" 
-                placeholder="Company CIN / Registration No. / Official Email" 
+                placeholder="Company CIN / Registration No. / Official Email / Phone" 
                 value={identifier}
                 onChange={(e) => { setIdentifier(e.target.value); setErrorMessage(''); }}
                 required 

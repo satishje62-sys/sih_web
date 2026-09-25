@@ -5,9 +5,11 @@ import {
   Star, AlertCircle, Heart, Check, RefreshCw, Globe, ExternalLink, Bot, Loader2
 } from 'lucide-react';
 import { getPublishedJobs, syncAiJobsFromWeb } from '../../utils/jobStorage';
+import { getCurrentUser } from '../../utils/authStorage';
 import './StudentIndustryJobs.css';
 
 const StudentIndustryJobs = () => {
+  const [currentUser] = useState(() => getCurrentUser('student'));
   const [jobs, setJobs] = useState(() => getPublishedJobs());
   const [search, setSearch] = useState('');
   const [selectedQual, setSelectedQual] = useState('All');
@@ -407,10 +409,14 @@ const StudentIndustryJobs = () => {
             <form onSubmit={confirmApply}>
               <div className="dialog-body">
                 <div className="applicant-card">
-                  <div className="applicant-avatar">PS</div>
+                  <div className="applicant-avatar">
+                    {(currentUser?.fullName || 'ST').split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'ST'}
+                  </div>
                   <div>
-                    <div style={{fontWeight: 700}}>Priya Sharma</div>
-                    <div style={{fontSize: '13px', color: '#64748b'}}>ITI Machinist & CNC Programming Certified (2024)</div>
+                    <div style={{fontWeight: 700}}>{currentUser?.fullName || 'Registered Student'}</div>
+                    <div style={{fontSize: '13px', color: '#64748b'}}>
+                      {currentUser?.educationLevel || 'ITI'} {currentUser?.tradeBranch || 'Technical Trainee'} ({currentUser?.instituteName || 'Maharashtra Institute'})
+                    </div>
                     <div style={{fontSize: '12px', color: '#059669', fontWeight: 600}}>✓ SkillBridge Verified Student Profile</div>
                   </div>
                 </div>

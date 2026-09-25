@@ -5,6 +5,7 @@ import {
   Users, Monitor, Award, Heart, Briefcase, CheckCircle2, X, Eye, Check, AlertCircle, Sparkles
 } from 'lucide-react';
 import { getCollaborations, updateCollaborationStatus, addCollaboration } from '../../utils/collaborationStorage';
+import { getCurrentUser } from '../../utils/authStorage';
 import './IndustryCollaboration.css';
 
 const CollabKpiCard = ({ title, value, change, changeText, icon: Icon, colorClass }) => (
@@ -32,6 +33,7 @@ const CollabOption = ({ title, icon: Icon, colorClass }) => (
 );
 
 const IndustryCollaboration = () => {
+  const [currentUser] = useState(() => getCurrentUser('employer'));
   const [collaborations, setCollaborations] = useState(() => getCollaborations());
   const [activeTab, setActiveTab] = useState('incoming'); // 'incoming' or 'all'
   const [searchIncoming, setSearchIncoming] = useState('');
@@ -92,15 +94,15 @@ const IndustryCollaboration = () => {
     const newCollab = {
       id: `collab-${Date.now()}`,
       instituteName: newCollabForm.institute,
-      industryName: 'ABC Industries Pvt. Ltd.',
-      sector: 'Manufacturing',
+      industryName: currentUser?.companyName || 'Registered Employer',
+      sector: currentUser?.sector || 'Manufacturing',
       trade: newCollabForm.program,
       skill: newCollabForm.skill.trim(),
       type: newCollabForm.type,
       students: Number(newCollabForm.students) || 15,
       duration: newCollabForm.duration,
       outcome: 'Industry Sponsored Training & Apprenticeship',
-      message: newCollabForm.description || `Industry partnership initiated by ABC Industries for ${newCollabForm.program}.`,
+      message: newCollabForm.description || `Industry partnership initiated by ${currentUser?.companyName || 'our company'} for ${newCollabForm.program}.`,
       status: 'Active',
       date: 'Just now',
       timestamp: Date.now()
