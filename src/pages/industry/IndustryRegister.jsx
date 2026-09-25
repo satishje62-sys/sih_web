@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Building2, ArrowRight, ArrowLeft, CheckCircle2, ShieldCheck, Briefcase, Lock } from 'lucide-react';
+import { registerEmployer } from '../../utils/authStorage';
 import '../institute/InstituteRegister.css'; // Reusing matching layout styles
 
 const MAHARASHTRA_DISTRICTS = [
@@ -89,7 +90,11 @@ const IndustryRegister = () => {
         setErrorMessage('Please enter a valid contact phone number.');
         return;
       }
-      if (form.password && form.password !== form.confirmPassword) {
+      if (!form.password || form.password.length < 6) {
+        setErrorMessage('Please create a password with at least 6 characters.');
+        return;
+      }
+      if (form.password !== form.confirmPassword) {
         setErrorMessage('Passwords do not match.');
         return;
       }
@@ -124,17 +129,10 @@ const IndustryRegister = () => {
       return;
     }
 
-    const registeredEmployer = {
-      id: `emp-${Date.now()}`,
-      ...form,
-      registeredAt: new Date().toLocaleDateString('en-IN')
-    };
-
-    // Save in localStorage for employer session
-    try {
-      localStorage.setItem('skillbridge_registered_employer', JSON.stringify(registeredEmployer));
-    } catch (err) {
-      console.error(err);
+    const regResult = registerEmployer(form);
+    if (!regResult.success) {
+      setErrorMessage(regResult.message);
+      return;
     }
 
     setSuccessModal(true);

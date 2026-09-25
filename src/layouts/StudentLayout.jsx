@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Home, User, ClipboardList, Target, Briefcase, 
-  BookOpen, Search, Bell, Menu, ArrowLeft
+  BookOpen, Search, Bell, Menu, ArrowLeft, LogOut
 } from 'lucide-react';
+import { getCurrentUser, logoutUser } from '../utils/authStorage';
 import './StudentLayout.css';
 
 const StudentLayout = () => {
@@ -12,6 +13,21 @@ const StudentLayout = () => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => getCurrentUser('student'));
+
+  useEffect(() => {
+    const handler = () => setCurrentUser(getCurrentUser('student'));
+    window.addEventListener('skillbridge:authChanged', handler);
+    return () => window.removeEventListener('skillbridge:authChanged', handler);
+  }, []);
+
+  const handleLogout = () => {
+    logoutUser('student');
+    navigate('/student/login');
+  };
+
+  const studentName = currentUser?.fullName || 'Priya Sharma';
+  const subtitle = `${currentUser?.tradeBranch || 'Trainee'} • ${currentUser?.instituteName || 'Maharashtra ITI'}`;
 
   return (
     <div className="dashboard-layout">
@@ -156,7 +172,9 @@ const StudentLayout = () => {
             >
               <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100&h=100" alt="Student" className="avatar-img" />
               <div className="user-info">
-                <span className="user-name">Priya Sharma</span>
+                <span className="user-name" style={{ maxWidth: '140px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {studentName}
+                </span>
                 <span className="user-role">Student Portal ▾</span>
               </div>
             </div>
@@ -167,7 +185,7 @@ const StudentLayout = () => {
                 top: '100%',
                 right: 0,
                 marginTop: '10px',
-                width: '240px',
+                width: '260px',
                 backgroundColor: 'white',
                 borderRadius: '10px',
                 border: '1px solid #e2e8f0',
@@ -179,8 +197,8 @@ const StudentLayout = () => {
                 gap: '4px'
               }}>
                 <div style={{ padding: '8px 10px', borderBottom: '1px solid #f1f5f9' }}>
-                  <div style={{ fontWeight: '700', fontSize: '13px', color: '#1e293b' }}>Priya Sharma</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>Fitter Trainee • Shree Ganesh ITI</div>
+                  <div style={{ fontWeight: '700', fontSize: '13px', color: '#1e293b' }}>{studentName}</div>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>{subtitle}</div>
                 </div>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#334155', cursor: 'pointer', borderRadius: '6px' }}
@@ -209,9 +227,9 @@ const StudentLayout = () => {
                 <div style={{ height: '1px', backgroundColor: '#f1f5f9', margin: '4px 0' }}></div>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#dc2626', fontWeight: '600', cursor: 'pointer', borderRadius: '6px' }}
-                  onClick={() => navigate('/')}
+                  onClick={handleLogout}
                 >
-                  Log Out
+                  <LogOut size={15} color="#dc2626" /> Log Out
                 </button>
               </div>
             )}

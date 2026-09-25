@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Home, Building2, BookOpen, Settings, BarChart2, 
-  Target, Users, Lightbulb, Bell, Search, Menu, ArrowLeft, Briefcase
+  Target, Users, Lightbulb, Bell, Search, Menu, ArrowLeft, Briefcase, LogOut
 } from 'lucide-react';
+import { getCurrentUser, logoutUser } from '../utils/authStorage';
 import './InstituteLayout.css';
 
 const InstituteLayout = () => {
@@ -11,6 +12,23 @@ const InstituteLayout = () => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => getCurrentUser('institute'));
+
+  useEffect(() => {
+    const handler = () => setCurrentUser(getCurrentUser('institute'));
+    window.addEventListener('skillbridge:authChanged', handler);
+    return () => window.removeEventListener('skillbridge:authChanged', handler);
+  }, []);
+
+  const handleLogout = () => {
+    logoutUser('institute');
+    navigate('/institute/login');
+  };
+
+  const instituteName = currentUser?.name || 'Registered Institute';
+  const initials = instituteName.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'IN';
+  const district = currentUser?.district ? `${currentUser.district}, Maharashtra` : 'Maharashtra';
+  const regNumber = currentUser?.regNumber || 'Affiliated ITI/Polytechnic';
 
   return (
     <div className="dashboard-layout">
@@ -120,9 +138,13 @@ const InstituteLayout = () => {
               style={{ cursor: 'pointer', position: 'relative' }}
               onClick={() => { setProfileMenuOpen(!profileMenuOpen); setNotificationsOpen(false); }}
             >
-              <div className="avatar" style={{ backgroundColor: '#2563eb', color: 'white' }}>SI</div>
+              <div className="avatar" style={{ backgroundColor: '#2563eb', color: 'white', fontWeight: '700' }}>
+                {initials}
+              </div>
               <div className="user-info">
-                <span className="user-name">Shree Ganesh ITI</span>
+                <span className="user-name" style={{ maxWidth: '170px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {instituteName}
+                </span>
                 <span className="user-role">Institute Portal ▾</span>
               </div>
             </div>
@@ -133,7 +155,7 @@ const InstituteLayout = () => {
                 top: '100%',
                 right: 0,
                 marginTop: '10px',
-                width: '240px',
+                width: '260px',
                 backgroundColor: 'white',
                 borderRadius: '10px',
                 border: '1px solid #e2e8f0',
@@ -145,8 +167,8 @@ const InstituteLayout = () => {
                 gap: '4px'
               }}>
                 <div style={{ padding: '8px 10px', borderBottom: '1px solid #f1f5f9' }}>
-                  <div style={{ fontWeight: '700', fontSize: '13px', color: '#1e293b' }}>Shree Ganesh ITI</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>Pune, Maharashtra</div>
+                  <div style={{ fontWeight: '700', fontSize: '13px', color: '#1e293b' }}>{instituteName}</div>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>{district} • {regNumber}</div>
                 </div>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#334155', cursor: 'pointer', borderRadius: '6px' }}
@@ -156,22 +178,22 @@ const InstituteLayout = () => {
                 </button>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#334155', cursor: 'pointer', borderRadius: '6px' }}
-                  onClick={() => navigate('/employer/dashboard')}
+                  onClick={() => navigate('/employer/login')}
                 >
                   <Building2 size={15} color="#16a34a" /> Switch to Employer Portal
                 </button>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#334155', cursor: 'pointer', borderRadius: '6px' }}
-                  onClick={() => navigate('/student/dashboard')}
+                  onClick={() => navigate('/student/login')}
                 >
                   <Users size={15} color="#9333ea" /> Switch to Student Portal
                 </button>
                 <div style={{ height: '1px', backgroundColor: '#f1f5f9', margin: '4px 0' }}></div>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#dc2626', fontWeight: '600', cursor: 'pointer', borderRadius: '6px' }}
-                  onClick={() => navigate('/')}
+                  onClick={handleLogout}
                 >
-                  Log Out
+                  <LogOut size={15} color="#dc2626" /> Log Out
                 </button>
               </div>
             )}

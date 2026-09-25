@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { CheckCircle2, Building2, BookOpen, Check, ShieldCheck, ArrowRight, ArrowLeft } from 'lucide-react';
+import { registerInstitute } from '../../utils/authStorage';
 import './InstituteRegister.css';
 
 const MAHARASHTRA_DISTRICTS = [
@@ -83,7 +84,11 @@ const InstituteRegister = () => {
         setErrorMessage('Please enter a valid official email address.');
         return;
       }
-      if (formData.password && formData.password !== formData.confirmPassword) {
+      if (!formData.password || formData.password.length < 6) {
+        setErrorMessage('Please create a password with at least 6 characters.');
+        return;
+      }
+      if (formData.password !== formData.confirmPassword) {
         setErrorMessage('Passwords do not match.');
         return;
       }
@@ -114,18 +119,14 @@ const InstituteRegister = () => {
       return;
     }
 
-    const registeredInstitute = {
-      id: `inst-${Date.now()}`,
+    const regResult = registerInstitute({
       type: instituteType,
-      ...formData,
-      registeredAt: new Date().toLocaleDateString('en-IN')
-    };
+      ...formData
+    });
 
-    // Save in localStorage
-    try {
-      localStorage.setItem('skillbridge_registered_institute', JSON.stringify(registeredInstitute));
-    } catch (err) {
-      console.error(err);
+    if (!regResult.success) {
+      setErrorMessage(regResult.message);
+      return;
     }
 
     setSuccessModal(true);

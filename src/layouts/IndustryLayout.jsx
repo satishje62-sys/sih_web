@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   Home, Building2, Briefcase, Target, LineChart, 
   Lightbulb, MessageSquare, Users, Award, 
-  FileText, Settings, Bell, HelpCircle, Search, Menu, ArrowLeft
+  FileText, Settings, Bell, HelpCircle, Search, Menu, ArrowLeft, LogOut
 } from 'lucide-react';
+import { getCurrentUser, logoutUser } from '../utils/authStorage';
 import './IndustryLayout.css';
 
 const IndustryLayout = () => {
@@ -13,18 +14,23 @@ const IndustryLayout = () => {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => getCurrentUser('employer'));
 
-  const navItems = [
-    { name: 'Company Profile', path: '/employer/dashboard', icon: Building2 },
-    { name: 'Job Openings', path: '/employer/dashboard/jobs', icon: Briefcase },
-    { name: 'Required Skills', path: '/employer/dashboard/skills', icon: Target },
-    { name: 'Skill Gap Feedback', path: '/employer/dashboard/gap-feedback', icon: MessageSquare },
-    { name: 'Institute Collaboration', path: '/employer/dashboard/collaboration', icon: Users },
-    { name: 'Apprenticeship & Internship', path: '/employer/dashboard/apprenticeship', icon: Award },
-    { name: 'Industry Feedback', path: '/employer/dashboard/feedback', icon: MessageSquare },
-    { name: 'Reports', path: '/employer/dashboard/reports', icon: FileText },
-    { name: 'Settings', path: '/employer/dashboard/settings', icon: Settings },
-  ];
+  useEffect(() => {
+    const handler = () => setCurrentUser(getCurrentUser('employer'));
+    window.addEventListener('skillbridge:authChanged', handler);
+    return () => window.removeEventListener('skillbridge:authChanged', handler);
+  }, []);
+
+  const handleLogout = () => {
+    logoutUser('employer');
+    navigate('/employer/login');
+  };
+
+  const companyName = currentUser?.companyName || 'Registered Employer';
+  const initials = companyName.split(' ').filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase() || 'EM';
+  const sector = currentUser?.sector || 'Industrial Sector';
+  const regNumber = currentUser?.regNumber || 'Registered Partner';
 
   return (
     <div className="dashboard-layout">
@@ -178,9 +184,13 @@ const IndustryLayout = () => {
               style={{ cursor: 'pointer', position: 'relative' }}
               onClick={() => { setProfileMenuOpen(!profileMenuOpen); setNotificationsOpen(false); setHelpOpen(false); }}
             >
-              <div className="avatar">AC</div>
+              <div className="avatar" style={{ backgroundColor: '#0284c7', color: 'white', fontWeight: '700' }}>
+                {initials}
+              </div>
               <div className="user-info">
-                <span className="user-name">ABC Industries Pvt. Ltd.</span>
+                <span className="user-name" style={{ maxWidth: '170px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {companyName}
+                </span>
                 <span className="user-role">Employer Portal ▾</span>
               </div>
             </div>
@@ -191,7 +201,7 @@ const IndustryLayout = () => {
                 top: '100%',
                 right: 0,
                 marginTop: '10px',
-                width: '240px',
+                width: '260px',
                 backgroundColor: 'white',
                 borderRadius: '10px',
                 border: '1px solid #e2e8f0',
@@ -203,8 +213,9 @@ const IndustryLayout = () => {
                 gap: '4px'
               }}>
                 <div style={{ padding: '8px 10px', borderBottom: '1px solid #f1f5f9' }}>
-                  <div style={{ fontWeight: '700', fontSize: '13px', color: '#1e293b' }}>ABC Industries</div>
-                  <div style={{ fontSize: '11px', color: '#64748b' }}>CIN: 27AABCT1234F1Z5</div>
+                  <div style={{ fontWeight: '700', fontSize: '13px', color: '#1e293b' }}>{companyName}</div>
+                  <div style={{ fontSize: '11px', color: '#64748b' }}>CIN: {regNumber}</div>
+                  <div style={{ fontSize: '11px', color: '#0369a1', marginTop: '2px' }}>{sector}</div>
                 </div>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#334155', cursor: 'pointer', borderRadius: '6px' }}
@@ -214,22 +225,22 @@ const IndustryLayout = () => {
                 </button>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#334155', cursor: 'pointer', borderRadius: '6px' }}
-                  onClick={() => navigate('/institute/dashboard')}
+                  onClick={() => navigate('/institute/login')}
                 >
                   <Building2 size={15} color="#16a34a" /> Switch to Institute Portal
                 </button>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#334155', cursor: 'pointer', borderRadius: '6px' }}
-                  onClick={() => navigate('/student/dashboard')}
+                  onClick={() => navigate('/student/login')}
                 >
                   <Users size={15} color="#9333ea" /> Switch to Student Portal
                 </button>
                 <div style={{ height: '1px', backgroundColor: '#f1f5f9', margin: '4px 0' }}></div>
                 <button 
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'none', textAlign: 'left', fontSize: '13px', color: '#dc2626', fontWeight: '600', cursor: 'pointer', borderRadius: '6px' }}
-                  onClick={() => navigate('/')}
+                  onClick={handleLogout}
                 >
-                  Log Out
+                  <LogOut size={15} color="#dc2626" /> Log Out
                 </button>
               </div>
             )}
