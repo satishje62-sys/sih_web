@@ -2,32 +2,56 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import AuthLayout from '../../layouts/AuthLayout';
 import { loginEmployer, DEMO_ACCOUNTS } from '../../utils/authStorage';
-import { AlertCircle, Eye, EyeOff, Sparkles, Building2 } from 'lucide-react';
-import '../institute/InstituteLogin.css';
+import { AlertCircle, Eye, EyeOff, Sparkles, Building2, Users, TrendingUp, CheckCircle2 } from 'lucide-react';
+import './IndustryLogin.css';
 
 const LeftPanel = () => (
-  <div className="institute-left-panel">
-    <p className="gov-text">MAHARASHTRA GOVERNMENT</p>
-    <h1 className="auth-title">Skill Development Platform</h1>
-    <p className="auth-subtitle">Bridging industry demand with skilled talent for a stronger Maharashtra.</p>
-    
-    <div className="auth-desc" style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
-      <div style={{ textAlign: 'center' }}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="#2b5ee8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="32" height="32" style={{marginBottom: '0.5rem'}}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        <p style={{fontSize: '0.875rem'}}>Real-time industry insights</p>
+  <div className="industry-left-panel">
+    <div>
+      <div className="industry-gov-badge">
+        <span className="industry-gov-dot"></span> MAHARASHTRA GOVERNMENT
       </div>
-      <div style={{ textAlign: 'center' }}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="#2b5ee8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="32" height="32" style={{marginBottom: '0.5rem'}}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-        <p style={{fontSize: '0.875rem'}}>Skill gap analysis</p>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="#2b5ee8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="32" height="32" style={{marginBottom: '0.5rem'}}><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
-        <p style={{fontSize: '0.875rem'}}>Better workforce for tomorrow</p>
+      <h1 className="auth-title" style={{ fontSize: '2.2rem', marginBottom: '0.5rem', lineHeight: '1.2' }}>Skill Development Platform</h1>
+      <p className="auth-subtitle" style={{ fontSize: '0.95rem', marginBottom: '0.75rem', color: '#475569' }}>
+        Bridging industry demand with skilled talent for a stronger Maharashtra.
+      </p>
+      
+      <div className="auth-desc" style={{ display: 'flex', gap: '1.25rem', marginTop: '0.75rem', marginBottom: '0.75rem' }}>
+        <div style={{ textAlign: 'center' }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2b5ee8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="26" height="26" style={{marginBottom: '0.25rem'}}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <p style={{fontSize: '0.78rem', fontWeight: 500, color: '#334155'}}>Real-time industry insights</p>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2b5ee8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="26" height="26" style={{marginBottom: '0.25rem'}}><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <p style={{fontSize: '0.78rem', fontWeight: 500, color: '#334155'}}>Skill gap analysis</p>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="#2b5ee8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" width="26" height="26" style={{marginBottom: '0.25rem'}}><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></svg>
+          <p style={{fontSize: '0.78rem', fontWeight: 500, color: '#334155'}}>Better workforce for tomorrow</p>
+        </div>
       </div>
     </div>
     
-    <div className="auth-illustration">
-      <div className="building-silhouette"></div>
+    {/* Professional Industry Showcase Photo Card */}
+    <div className="industry-photo-showcase">
+      <div className="industry-photo-frame">
+        <img 
+          src="/images/industry-professional.jpg" 
+          alt="Modern Industrial Manufacturing & Automation Facility" 
+          className="industry-photo-img" 
+        />
+        <div className="industry-photo-badge">
+          <span className="industry-badge-pulse"></span>
+          <span>Industry 4.0 & Smart Manufacturing</span>
+        </div>
+      </div>
+      <div className="industry-photo-info">
+        <div className="industry-info-col">
+          <span className="industry-info-title">Maharashtra Industrial Corridor</span>
+          <span className="industry-info-desc">Automated Robotics & Advanced Engineering</span>
+        </div>
+        <span className="industry-tag-pill">MIDC Partner</span>
+      </div>
     </div>
   </div>
 );

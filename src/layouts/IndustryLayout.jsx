@@ -63,6 +63,37 @@ const IndustryLayout = () => {
           </NavLink>
         </nav>
 
+        <div className="sidebar-industry-card" style={{
+          margin: '0 14px 12px 14px',
+          borderRadius: '10px',
+          overflow: 'hidden',
+          border: '1px solid rgba(255,255,255,0.12)',
+          background: 'rgba(30, 41, 59, 0.7)',
+          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.2)'
+        }}>
+          <div style={{ position: 'relative', width: '100%', height: '85px', overflow: 'hidden' }}>
+            <img 
+              src="/images/industry-professional.jpg" 
+              alt="Industry Partner" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+            />
+            <div style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              background: 'linear-gradient(to top, rgba(15, 23, 42, 0.9) 0%, transparent 100%)',
+              padding: '6px 8px'
+            }}>
+              <span style={{ color: '#38bdf8', fontWeight: 600, fontSize: '10px' }}>● Smart Industry Facility</span>
+            </div>
+          </div>
+          <div style={{ padding: '6px 10px', fontSize: '10px', color: '#94a3b8', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span>Verified Employer</span>
+            <span style={{ color: '#22c55e', fontWeight: 600 }}>Active</span>
+          </div>
+        </div>
+
         <div className="sidebar-footer">
           <div className="gov-seal">
             <div className="building-silhouette-small"></div>
