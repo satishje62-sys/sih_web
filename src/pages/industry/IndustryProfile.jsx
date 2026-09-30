@@ -134,7 +134,7 @@ const IndustryProfile = () => {
               <p>{sector} • Partner in Skill Development</p>
             </div>
             <div className="company-image">
-              <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop" alt="Company Office" />
+              <img src="/images/industry-professional.jpg" alt="Company Industrial Facility & Robotics" />
             </div>
           </div>
           
